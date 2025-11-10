@@ -1,0 +1,88 @@
+SQL*Plus: Release 21.0.0.0.0 - Production on Mon Nov 10 14:42:50 2025
+Version 21.3.0.0.0
+
+Copyright (c) 1982, 2021, Oracle.  All rights reserved.
+
+Enter user-name: system
+Enter password:
+Last Successful login time: Mon Nov 10 2025 14:14:50 +05:30
+
+Connected to:
+Oracle Database 21c Express Edition Release 21.0.0.0.0 - Production
+Version 21.3.0.0.0
+
+SQL> CREATE TABLE Borrower1 (
+  2      Roll_no      NUMBER(5) PRIMARY KEY,
+  3      Name         VARCHAR2(50) NOT NULL,
+  4      Date_of_Issue DATE NOT NULL,
+  5      NameOfBook   VARCHAR2(50),
+  6      Status       CHAR(1) CHECK (Status IN ('I','R'))
+  7  );
+
+Table created.
+
+SQL> CREATE TABLE Fine1 (
+  2      Roll_no   NUMBER(5),
+  3      FineDate  DATE DEFAULT SYSDATE,
+  4      Amt       NUMBER(10,2),
+  5      CONSTRAINT fk_fine_borrower
+  6          FOREIGN KEY (Roll_no) REFERENCES Borrower1(Roll_no)
+  7  );
+
+Table created.
+
+SQL> INSERT INTO Borrower1
+  2  VALUES (1, 'Asha Patil', DATE '2025-01-10', 'DBMS Concepts', 'I');
+
+1 row created.
+
+SQL> INSERT INTO Borrower1
+  2  VALUES (2, 'Rahul Deshmukh', DATE '2025-01-12', 'Let Us C', 'I');
+
+1 row created.
+
+SQL> set serveroutput on
+
+SQL> @"C:\Users\Siddesh Borade\OneDrive\Desktop\dbms\Book1.sql"
+Enter value for r: 1
+old   9:     R := &R;
+new   9:     R := 1;
+Enter value for bn: DBMS Concepts
+old  10:     Bn := '&Bn';
+new  10:     Bn := 'DBMS Concepts';
+Fine: 15230.8
+
+PL/SQL procedure successfully completed.
+
+SQL> @"C:\Users\Siddesh Borade\OneDrive\Desktop\dbms\Book1.sql"
+Enter value for r: 2
+old   9:     R := &R;
+new   9:     R := 2;
+Enter value for bn: Let Us C
+old  10:     Bn := '&Bn';
+new  10:     Bn := 'Let Us C';
+Fine: 15130.81
+
+PL/SQL procedure successfully completed.
+
+SQL> select * from fine1;
+
+   ROLL_NO FINEDATE         AMT
+---------- --------- ----------
+         1 10-NOV-25    15230.8
+         2 10-NOV-25   15130.81
+
+SQL> select * from borrower1;
+
+   ROLL_NO NAME                                               DATE_OF_I
+---------- -------------------------------------------------- ---------
+NAMEOFBOOK                                         S
+-------------------------------------------------- -
+         1 Asha Patil                                         10-JAN-25
+DBMS Concepts                                      R
+
+         2 Rahul Deshmukh                                     12-JAN-25
+Let Us C                                           R
+
+
+SQL>
