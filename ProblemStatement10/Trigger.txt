@@ -1,0 +1,88 @@
+SQL*Plus: Release 21.0.0.0.0 - Production on Mon Nov 10 15:44:57 2025
+Version 21.3.0.0.0
+
+Copyright (c) 1982, 2021, Oracle.  All rights reserved.
+
+Enter user-name: system
+Enter password:
+Last Successful login time: Mon Nov 10 2025 15:34:33 +05:30
+
+Connected to:
+Oracle Database 21c Express Edition Release 21.0.0.0.0 - Production
+Version 21.3.0.0.0
+
+SQL> CREATE TABLE Books(
+  2      AccNo NUMBER,
+  3      Title VARCHAR2(50),
+  4      Author VARCHAR2(50),
+  5      Publisher VARCHAR2(50),
+  6      Count NUMBER
+  7  );
+
+Table created.
+
+SQL> CREATE TABLE Library_Audit AS SELECT * FROM Books WHERE 1=0;
+
+Table created.
+
+SQL> @"C:\Users\Siddesh Borade\OneDrive\Desktop\dbms\Beforetrigger.sql"
+
+Trigger created.
+
+SQL> INSERT INTO Books VALUES (1, 'DBMS', 'Korth', 'McGraw', 5);
+
+1 row created.
+
+SQL> DELETE FROM Books WHERE AccNo = 1;
+
+1 row deleted.
+
+SQL> SELECT * FROM Library_Audit;
+
+     ACCNO TITLE
+---------- --------------------------------------------------
+AUTHOR
+--------------------------------------------------
+PUBLISHER                                               COUNT
+-------------------------------------------------- ----------
+         1 DBMS
+Korth
+McGraw                                                      5
+
+SQL> @"C:\Users\Siddesh Borade\OneDrive\Desktop\dbms\AfterTrigger.sql"
+
+Trigger created.
+
+SQL> INSERT INTO Books VALUES (2, 'C Programming', 'Dennis', 'PHI', 4);
+
+1 row created.
+
+SQL> UPDATE Books SET Count = 10 WHERE AccNo = 2;
+
+1 row updated.
+
+SQL> SELECT * FROM Library_Audit;
+
+     ACCNO TITLE
+---------- --------------------------------------------------
+AUTHOR
+--------------------------------------------------
+PUBLISHER                                               COUNT
+-------------------------------------------------- ----------
+         1 DBMS
+Korth
+McGraw                                                      5
+
+         2 C Programming
+Dennis
+PHI                                                        10
+
+     ACCNO TITLE
+---------- --------------------------------------------------
+AUTHOR
+--------------------------------------------------
+PUBLISHER                                               COUNT
+-------------------------------------------------- ----------
+
+
+SQL>
