@@ -1,0 +1,72 @@
+SQL*Plus: Release 21.0.0.0.0 - Production on Mon Nov 10 15:16:06 2025
+Version 21.3.0.0.0
+
+Copyright (c) 1982, 2021, Oracle.  All rights reserved.
+
+Enter user-name: system
+Enter password:
+Last Successful login time: Mon Nov 10 2025 14:56:27 +05:30
+
+Connected to:
+Oracle Database 21c Express Edition Release 21.0.0.0.0 - Production
+Version 21.3.0.0.0
+
+SQL> CREATE TABLE Student_Result (
+  2      stud_id      NUMBER(5) PRIMARY KEY,
+  3      name         VARCHAR2(50),
+  4      dept         VARCHAR2(20),
+  5      total_mark   NUMBER(5)
+  6  );
+
+Table created.
+
+SQL> set serveroutput on
+
+SQL> @"C:\Users\Siddesh Borade\OneDrive\Desktop\dbms\implicit1.sql"
+
+PL/SQL procedure successfully completed.
+
+SQL> select * from Student_Result;
+
+   STUD_ID NAME
+---------- --------------------------------------------------
+DEPT                 TOTAL_MARK
+-------------------- ----------
+       101 Asha Patil
+CSE                         455
+
+
+SQL> @"C:\Users\Siddesh Borade\OneDrive\Desktop\dbms\explicit1.sql"
+Asha Patil - 455
+
+PL/SQL procedure successfully completed.
+
+SQL> @"C:\Users\Siddesh Borade\OneDrive\Desktop\dbms\parameterized1.sql"
+Enter value for department: CSE
+old   7:     v_d Student_Result.dept%TYPE := '&Department';
+new   7:     v_d Student_Result.dept%TYPE := 'CSE';
+101 - Asha Patil - 455
+
+PL/SQL procedure successfully completed.
+
+SQL> @"C:\Users\Siddesh Borade\OneDrive\Desktop\dbms\forloop1.sql"
+101 - Asha Patil - 455
+
+PL/SQL procedure successfully completed.
+
+SQL> @"C:\Users\Siddesh Borade\OneDrive\Desktop\dbms\update1.sql"
+Marks updated.
+
+PL/SQL procedure successfully completed.
+
+SQL> select * from Student_result;
+
+   STUD_ID NAME
+---------- --------------------------------------------------
+DEPT                 TOTAL_MARK
+-------------------- ----------
+       101 Asha Patil
+CSE                         460
+
+
+SQL>
