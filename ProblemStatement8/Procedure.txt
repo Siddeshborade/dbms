@@ -1,0 +1,47 @@
+SQL*Plus: Release 21.0.0.0.0 - Production on Mon Nov 10 14:56:23 2025
+Version 21.3.0.0.0
+
+Copyright (c) 1982, 2021, Oracle.  All rights reserved.
+
+Enter user-name: system
+Enter password:
+Last Successful login time: Mon Nov 10 2025 14:43:49 +05:30
+
+Connected to:
+Oracle Database 21c Express Edition Release 21.0.0.0.0 - Production
+Version 21.3.0.0.0
+
+SQL> create table student_mark1(rollno int, name varchar(20), total_mark int);
+
+Table created.
+
+SQL> insert into student_mark1 values (101, 'Sathvik', 1200);
+
+1 row created.
+
+SQL> insert into student_mark1 values (102, 'Aryan', 950);
+
+1 row created.
+
+SQL> insert into student_mark1 values (103, 'Sarthak', 800);
+
+1 row created.
+
+SQL> create table student_result1(rollno int, name varchar2(20), grade varchar(20));
+
+Table created.
+
+SQL> set serveroutput on
+SQL> @"C:\Users\Siddesh Borade\OneDrive\Desktop\dbms\Procedure1.sql"
+
+Procedure created.
+
+SQL> @"C:\Users\Siddesh Borade\OneDrive\Desktop\dbms\Procedure2.sql"
+101 Sathvik 1st class with dist.
+102 Aryan 1st class
+103 Sarthak Fail
+All records processed and inserted.
+
+PL/SQL procedure successfully completed.
+
+SQL>
