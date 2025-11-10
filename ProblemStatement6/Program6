@@ -1,0 +1,203 @@
+Enter password: ****
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 16
+Server version: 9.2.0 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2025, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> create database SalesDB;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> use SalesDB;
+Database changed
+mysql> ^C
+mysql> CREATE TABLE Customer (
+    ->     customer_id INT PRIMARY KEY,
+    ->     customer_name VARCHAR(100) NOT NULL,
+    ->     city VARCHAR(50),
+    ->     email VARCHAR(120) UNIQUE
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> CREATE TABLE Product (
+    ->     product_id INT PRIMARY KEY,
+    ->     product_name VARCHAR(100) NOT NULL,
+    ->     category VARCHAR(50),
+    ->     price DECIMAL(10,2) CHECK (price >= 0)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> CREATE TABLE Sale (
+    ->     sale_id INT PRIMARY KEY,
+    ->     customer_id INT,
+    ->     product_id INT,
+    ->     quantity INT CHECK (quantity > 0),
+    ->     sale_date DATE,
+    ->     total_amount DECIMAL(12,2) CHECK (total_amount >= 0),
+    ->
+    ->     FOREIGN KEY (customer_id) REFERENCES Customer(customer_id),
+    ->     FOREIGN KEY (product_id) REFERENCES Product(product_id)
+    -> );
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> INSERT INTO Customer VALUES (1, 'Asha', 'Mumbai', 'asha@test.com');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> INSERT INTO Customer VALUES (2, 'Rahul', 'Pune', 'rahul@test.com');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> INSERT INTO Customer VALUES (3, 'Meera', 'Mumbai', 'meera@test.com');
+Query OK, 1 row affected (0.00 sec)
+
+mysql> INSERT INTO Product VALUES (101, 'Laptop', 'Electronics', 45000);
+Query OK, 1 row affected (0.01 sec)
+
+mysql> INSERT INTO Product VALUES (102, 'Mobile', 'Electronics', 15000);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> INSERT INTO Product VALUES (103, 'Chair', 'Furniture', 2000);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> INSERT INTO Sale VALUES (1, 1, 101, 1, '2025-01-10', 45000);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> INSERT INTO Sale VALUES (2, 1, 102, 2, '2025-01-12', 30000);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> INSERT INTO Sale VALUES (3, 2, 103, 3, '2025-01-15', 6000);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> INSERT INTO Sale VALUES (4, 3, 101, 1, '2025-01-20', 45000);
+Query OK, 1 row affected (0.00 sec)
+
+mysql> SELECT customer_id, SUM(total_amount) AS total_sales
+    -> FROM Sale
+    -> GROUP BY customer_id;
++-------------+-------------+
+| customer_id | total_sales |
++-------------+-------------+
+|           1 |    75000.00 |
+|           2 |     6000.00 |
+|           3 |    45000.00 |
++-------------+-------------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT product_id, SUM(quantity) AS total_quantity
+    -> FROM Sale
+    -> GROUP BY product_id;
++------------+----------------+
+| product_id | total_quantity |
++------------+----------------+
+|        101 |              2 |
+|        102 |              2 |
+|        103 |              3 |
++------------+----------------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT
+    ->     MAX(price) AS highest_price,
+    ->     MIN(price) AS lowest_price
+    -> FROM Product;
++---------------+--------------+
+| highest_price | lowest_price |
++---------------+--------------+
+|      45000.00 |      2000.00 |
++---------------+--------------+
+1 row in set (0.00 sec)
+
+mysql> SELECT c.city, AVG(s.total_amount) AS avg_sales
+    -> FROM Customer c
+    -> JOIN Sale s ON c.customer_id = s.customer_id
+    -> GROUP BY c.city;
++--------+--------------+
+| city   | avg_sales    |
++--------+--------------+
+| Mumbai | 40000.000000 |
+| Pune   |  6000.000000 |
++--------+--------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT p.category,
+    ->        SUM(s.total_amount) AS total_sales,
+    ->        COUNT(s.sale_id) AS total_transactions
+    -> FROM Product p
+    -> JOIN Sale s ON p.product_id = s.product_id
+    -> GROUP BY p.category;
++-------------+-------------+--------------------+
+| category    | total_sales | total_transactions |
++-------------+-------------+--------------------+
+| Electronics |   120000.00 |                  3 |
+| Furniture   |     6000.00 |                  1 |
++-------------+-------------+--------------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT customer_id, customer_name
+    -> FROM Customer
+    -> WHERE customer_id IN (
+    ->     SELECT customer_id
+    ->     FROM Sale
+    ->     GROUP BY customer_id
+    ->     HAVING SUM(total_amount) >
+    ->            (SELECT AVG(total_amount) FROM Sale)
+    -> );
++-------------+---------------+
+| customer_id | customer_name |
++-------------+---------------+
+|           1 | Asha          |
+|           3 | Meera         |
++-------------+---------------+
+2 rows in set (0.00 sec)
+
+mysql> CREATE TEMPORARY TABLE sales_summary AS
+    -> SELECT customer_id, SUM(total_amount) AS total_sales
+    -> FROM Sale
+    -> GROUP BY customer_id;
+Query OK, 3 rows affected (0.00 sec)
+Records: 3  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM sales_summary
+    -> WHERE total_sales > 10000;
++-------------+-------------+
+| customer_id | total_sales |
++-------------+-------------+
+|           1 |    75000.00 |
+|           3 |    45000.00 |
++-------------+-------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT product_id, COUNT(sale_id) AS times_sold
+    -> FROM Sale
+    -> GROUP BY product_id;
++------------+------------+
+| product_id | times_sold |
++------------+------------+
+|        101 |          2 |
+|        102 |          1 |
+|        103 |          1 |
++------------+------------+
+3 rows in set (0.00 sec)
+
+mysql> SELECT customer_id, customer_name
+    -> FROM Customer
+    -> WHERE customer_id IN (
+    ->     SELECT customer_id
+    ->     FROM Sale
+    ->     WHERE product_id IN (
+    ->         SELECT product_id FROM Product WHERE category='Electronics'
+    ->     )
+    -> );
++-------------+---------------+
+| customer_id | customer_name |
++-------------+---------------+
+|           1 | Asha          |
+|           3 | Meera         |
++-------------+---------------+
+2 rows in set (0.00 sec)
+
+mysql>
