@@ -1,0 +1,118 @@
+Enter password: ****
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 14
+Server version: 9.2.0 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2025, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> create database BankSystemDB;
+Query OK, 1 row affected (0.01 sec)
+
+mysql> use BankSystemDB;
+Database changed
+mysql> CREATE TABLE Customer (
+    ->     CustomerID INT PRIMARY KEY,
+    ->     Name VARCHAR(100) NOT NULL,
+    ->     Address VARCHAR(200),
+    ->     Phone VARCHAR(15),
+    ->     Email VARCHAR(100)
+    -> );
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> CREATE TABLE Account (
+    ->     AccountID INT PRIMARY KEY,
+    ->     CustomerID INT NOT NULL,
+    ->     AccountType VARCHAR(20) CHECK (AccountType IN ('Savings', 'Current', 'Loan')),
+    ->     Balance DECIMAL(12,2) CHECK (Balance >= 0),
+    ->     CreatedDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ->
+    ->     FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID)
+    -> );
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> CREATE TABLE TransactionTable (
+    ->     TransactionID INT PRIMARY KEY,
+    ->     AccountID INT NOT NULL,
+    ->     TransactionType VARCHAR(10) CHECK (TransactionType IN ('Credit', 'Debit')),
+    ->     Amount DECIMAL(12,2) NOT NULL,
+    ->     TransactionDate DATETIME DEFAULT CURRENT_TIMESTAMP,
+    ->
+    ->     FOREIGN KEY (AccountID) REFERENCES Account(AccountID)
+    -> );
+Query OK, 0 rows affected (0.03 sec)
+
+mysql> INSERT INTO Customer (CustomerID, Name, Address, Phone, Email)
+    -> VALUES (1, 'Rahul Sharma', 'Mumbai, MH', '9876543210', 'rahul@gmail.com');
+Query OK, 1 row affected (0.01 sec)
+
+mysql> INSERT INTO Account (AccountID, CustomerID, AccountType, Balance, CreatedDate)
+    -> VALUES (101, 1, 'Savings', 15000, NOW());
+Query OK, 1 row affected (0.01 sec)
+
+mysql> INSERT INTO TransactionTable (TransactionID, AccountID, TransactionType, Amount, TransactionDate)
+    -> VALUES (1001, 101, 'Credit', 5000, NOW());
+Query OK, 1 row affected (0.01 sec)
+
+mysql> CREATE VIEW CustomerAccountView AS
+    -> SELECT
+    ->     c.Name AS CustomerName,
+    ->     a.AccountID,
+    ->     a.Balance
+    -> FROM Customer c
+    -> JOIN Account a ON c.CustomerID = a.CustomerID;
+Query OK, 0 rows affected (0.00 sec)
+
+mysql> CREATE INDEX idx_TransactionDate
+    -> ON TransactionTable(TransactionDate);
+Query OK, 0 rows affected (0.03 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> select * from Customer;
++------------+--------------+------------+------------+-----------------+
+| CustomerID | Name         | Address    | Phone      | Email           |
++------------+--------------+------------+------------+-----------------+
+|          1 | Rahul Sharma | Mumbai, MH | 9876543210 | rahul@gmail.com |
++------------+--------------+------------+------------+-----------------+
+1 row in set (0.00 sec)
+
+mysql> select * from Account;
++-----------+------------+-------------+----------+---------------------+
+| AccountID | CustomerID | AccountType | Balance  | CreatedDate         |
++-----------+------------+-------------+----------+---------------------+
+|       101 |          1 | Savings     | 15000.00 | 2025-11-10 13:13:02 |
++-----------+------------+-------------+----------+---------------------+
+1 row in set (0.00 sec)
+
+mysql> select * from TransactionTable;
++---------------+-----------+-----------------+---------+---------------------+
+| TransactionID | AccountID | TransactionType | Amount  | TransactionDate     |
++---------------+-----------+-----------------+---------+---------------------+
+|          1001 |       101 | Credit          | 5000.00 | 2025-11-10 13:13:07 |
++---------------+-----------+-----------------+---------+---------------------+
+1 row in set (0.00 sec)
+
+mysql> select * from CustomerAccountView;
++--------------+-----------+----------+
+| CustomerName | AccountID | Balance  |
++--------------+-----------+----------+
+| Rahul Sharma |       101 | 15000.00 |
++--------------+-----------+----------+
+1 row in set (0.01 sec)
+
+mysql> SHOW INDEX FROM TransactionTable;
++------------------+------------+---------------------+--------------+-----------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| Table            | Non_unique | Key_name            | Seq_in_index | Column_name     | Collation | Cardinality | Sub_part | Packed | Null | Index_type | Comment | Index_comment | Visible | Expression |
++------------------+------------+---------------------+--------------+-----------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+| transactiontable |          0 | PRIMARY             |            1 | TransactionID   | A         |           1 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| transactiontable |          1 | AccountID           |            1 | AccountID       | A         |           1 |     NULL |   NULL |      | BTREE      |         |               | YES     | NULL       |
+| transactiontable |          1 | idx_TransactionDate |            1 | TransactionDate | A         |           1 |     NULL |   NULL | YES  | BTREE      |         |               | YES     | NULL       |
++------------------+------------+---------------------+--------------+-----------------+-----------+-------------+----------+--------+------+------------+---------+---------------+---------+------------+
+3 rows in set (0.02 sec)
+
+mysql>
