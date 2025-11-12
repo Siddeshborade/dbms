@@ -1,0 +1,63 @@
+// --------------------------
+// MongoDB Books CRUD & Aggregation
+// --------------------------
+
+//  Switch to database
+use library;
+
+// 1. Create collection
+db.createCollection("books");
+
+// 2. Insert sample documents
+db.books.insertMany([
+  { TITLE: "mongodb", DESCRIPTION: "Introduction to MongoDB", BY: "john", URL: "http://mongodb.com", TAGS: ["NoSQL", "Database"], LIKES: 50 },
+  { TITLE: "nodejs", DESCRIPTION: "Node.js Tutorial", BY: "alice", URL: "http://nodejs.org", TAGS: ["JavaScript", "Backend"], LIKES: 20 },
+  { TITLE: "expressjs", DESCRIPTION: "Express.js Framework", BY: "bob", URL: "http://expressjs.com", TAGS: ["Node.js", "Web"], LIKES: 15 },
+  { TITLE: "nosql overview", DESCRIPTION: "Overview of NoSQL databases", BY: "john", URL: "http://nosql.com", TAGS: ["Database", "NoSQL"], LIKES: 5 },
+  { TITLE: "reactjs", DESCRIPTION: "React.js Library", BY: "carol", URL: "http://reactjs.org", TAGS: ["Frontend", "JavaScript"], LIKES: 30 }
+]);
+
+//  3.query
+db.books.insertOne({
+  TITLE: "angularjs",
+  DESCRIPTION: "AngularJS Framework",
+  BY: "dave",
+  URL: "http://angularjs.org",
+  TAGS: ["Frontend", "JavaScript"],
+  LIKES: 40,
+  USERNAME: "mauli",
+  COMMENTS: "Great book for beginners!"
+});
+
+// --------------------------
+// CRUD Operations
+// --------------------------
+
+// 4.Find by title
+db.books.find({ TITLE: "mongodb" });
+
+// 5.Find by OR condition
+db.books.find({ $or: [{ BY: "john" }, { TITLE: "mongodb" }] });
+
+// 6.Find by AND condition
+db.books.find({ TITLE: "mongodb", BY: "john" });
+
+// 7.Find documents with likes > 10
+db.books.find({ LIKES: { $gt: 10 } });
+
+// 8.Find documents with likes > 100 AND (title is 'mongodb' OR by 'john')
+db.books.find({ $and: [{ LIKES: { $gt: 100 } }, { $or: [{ TITLE: "mongodb" }, { BY: "john" }] }] });
+
+// 9.Update document
+db.books.updateOne({ TITLE: "mongodb" }, { $set: { TITLE: "mongodb overview" } });
+
+// 10.Delete document
+db.books.deleteOne({ TITLE: "angularjs" });
+
+// 11.Limit 
+db.books.find({ BY: "john" }).limit(2);
+//12 limit and skip
+db.books.find({ BY: "john" }).skip(1).limit(1);
+
+// 13.Sort books by title
+db.books.find().sort({ TITLE: 1 });
