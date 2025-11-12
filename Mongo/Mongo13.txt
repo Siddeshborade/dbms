@@ -1,0 +1,83 @@
+//1.create database
+use myLibrary;
+// 2. create Collection
+db.createCollection("books");
+
+// 3.insertmany
+
+
+db.books.insertMany([
+  { TITLE: "mongodb", DESCRIPTION: "Intro to MongoDB", BY: "john", URL: "http://mongodb.com", TAGS: ["NoSQL", "Database"], LIKES: 50 },
+  { TITLE: "nodejs", DESCRIPTION: "Node.js Tutorial", BY: "alice", URL: "http://nodejs.org", TAGS: ["JavaScript", "Backend"], LIKES: 20 },
+  { TITLE: "expressjs", DESCRIPTION: "Express.js Framework", BY: "bob", URL: "http://expressjs.com", TAGS: ["Node.js", "Web"], LIKES: 15 },
+  { TITLE: "nosql overview", DESCRIPTION: "Overview of NoSQL databases", BY: "john", URL: "http://nosql.com", TAGS: ["Database", "NoSQL"], LIKES: 5 },
+  { TITLE: "reactjs", DESCRIPTION: "React.js Library", BY: "carol", URL: "http://reactjs.org", TAGS: ["Frontend", "JavaScript"], LIKES: 30 },
+  { TITLE: "angularjs", DESCRIPTION: "AngularJS Framework", BY: "john", URL: "http://angularjs.org", TAGS: ["Frontend", "JavaScript"], LIKES: 40 }
+]);
+
+// Queries
+
+//1. Find the number of books published by john.
+db.books.aggregate([
+  { $match: { BY: "john" } },
+  { $count: "books_by_john" }
+]);
+
+// 2. Find books which have minimum likes and maximum likes published by john.
+db.books.aggregate([
+  { $match: { BY: "john" } },
+  {
+    $group: {
+      _id: "$BY",
+      minLikes: { $min: "$LIKES" },
+      maxLikes: { $max: "$LIKES" }
+    }
+  }
+]);
+
+//3. Find the average number of likes of the books published by john
+
+
+db.books.aggregate([
+  { $match: { BY: "john" } },
+  {
+    $group: {
+      _id: "$BY",
+      avgLikes: { $avg: "$LIKES" }
+    }
+  }
+]);
+
+
+//4.Find the first and last book published by john
+
+
+db.books.aggregate([
+  { $match: { BY: "john" } },
+  {
+    $group: {
+      _id: "$BY",
+      firstBook: { $first: "$TITLE" },
+      lastBook: { $last: "$TITLE" }
+    }
+  }
+]);
+
+//5. Create an index on author name
+
+db.books.createIndex({ BY: 1 });
+
+
+// THank you/...................
+
+
+
+
+
+
+
+
+
+
+
+
